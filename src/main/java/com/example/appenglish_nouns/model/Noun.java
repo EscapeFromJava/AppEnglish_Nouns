@@ -6,14 +6,23 @@ public class Noun {
     public String inRussian;
     public int inGroup;
 
-    public Noun() {
+    public int getId() {
+        return id;
     }
 
-    public Noun(int id, String inEnglish, String inRussian) {
-        this.id = id;
-        this.inEnglish = inEnglish.toLowerCase();
-        this.inRussian = inRussian.toLowerCase();
-        this.inGroup = 0;
+    public String getInEnglish() {
+        return inEnglish;
+    }
+
+    public String getInRussian() {
+        return inRussian;
+    }
+
+    public int getInGroup() {
+        return inGroup;
+    }
+
+    public Noun() {
     }
 
     public Noun(int id, String inEnglish, String inRussian, int inGroup) {
@@ -36,6 +45,7 @@ public class Noun {
 
     @Override
     public String toString() {
-        return  id + " " + inEnglish + " " + inRussian + " " + inGroup;
+        return id + " " + inEnglish + " " + inRussian + " " + inGroup;
     }
+
 }

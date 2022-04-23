@@ -16,6 +16,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(root);
         stage.setTitle("Nouns!");
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 

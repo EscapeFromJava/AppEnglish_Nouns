@@ -1,12 +1,11 @@
 package com.example.appenglish_nouns.controller;
 
 import com.example.appenglish_nouns.model.Noun;
-import javafx.event.ActionEvent;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,16 +13,27 @@ import java.util.Random;
 
 public class MainController {
     @FXML
+    TableView<Noun> tableWords;
+    @FXML
+    TableColumn<Noun, Integer> idColumn;
+    @FXML
+    TableColumn<Noun, String> inEnglishColumn;
+    @FXML
+    TableColumn<Noun, String> inRussianColumn;
+    @FXML
+    TableColumn<Noun, Integer> inGroupColumn;
+    @FXML
     TextField txtInEnglsh, txtInRussian, txtInGroup;
     @FXML
     Button btnStart, btnCheck, btnFinish, btnAddNoun, btnGetList;
     @FXML
     Label lblInput;
     @FXML
-    TextArea txtAreaOutput, txtAreaListWords;
+    TextArea txtAreaOutput;
 
     Noun actualNoun;
     ArrayList<Noun> arrayNouns;
+    ObservableList<Noun> observableListNouns;
     Connection conn;
 
     public void initialize() {
@@ -32,30 +42,7 @@ public class MainController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        /*if (conn != null) {
-            System.out.println("Connected to the database!");
-        } else {
-            System.out.println("Failed to make connection!");
-        }*/
         runSelect(conn);
-        getNoun(arrayNouns);
-        /*try (Connection conn = DriverManager
-                .getConnection("jdbc:postgresql://127.0.0.1:5432/EnglishApp", "postgres", "123")) {
-            if (conn != null) {
-                System.out.println("Connected to the database!");
-            } else {
-                System.out.println("Failed to make connection!");
-            }
-
-            runSelect(conn);
-            getNoun(arrayNouns);
-
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
 
     }
 
@@ -86,8 +73,7 @@ public class MainController {
             } catch (SQLException e) {
                 System.out.println("insert ERROR: " + e.getMessage());
             }
-        }
-        else {
+        } else {
             try {
                 String execute = "INSERT INTO nouns(in_english, in_russian, in_group)  " +
                         "VALUES( \'" + newNoun.inEnglish + "\', \'" + newNoun.inRussian + "\', " + newNoun.inGroup + ");";
@@ -104,6 +90,7 @@ public class MainController {
     }
 
     public void onButtonStartClick() {
+        getNoun(arrayNouns);
         lblInput.setText(actualNoun.inEnglish);
     }
 
@@ -127,11 +114,17 @@ public class MainController {
         runInsert(conn, addNoun);
     }
 
-    public void onButtonGetListClick(ActionEvent actionEvent) {
+    public void onButtonGetListClick() {
         runSelect(conn);
-        txtAreaListWords.clear();
-        for (Noun n: arrayNouns) {
-            txtAreaListWords.appendText(n.toString() + "\n");
-        }
+
+        observableListNouns = FXCollections.observableArrayList();
+        observableListNouns.addAll(arrayNouns);
+
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        inEnglishColumn.setCellValueFactory(new PropertyValueFactory<>("inEnglish"));
+        inRussianColumn.setCellValueFactory(new PropertyValueFactory<>("inRussian"));
+        inGroupColumn.setCellValueFactory(new PropertyValueFactory<>("inGroup"));
+
+        tableWords.setItems(observableListNouns);
     }
 }
