@@ -12,16 +12,21 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="22.0" tabMinWidth="80.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.appenglish_nouns.controller.MainController">
+<TabPane fx:id="tabPaneMain" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="22.0" tabMinWidth="80.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.appenglish_nouns.controller.MainController">
   <tabs>
       <Tab text="Menu">
         <content>
-          <AnchorPane fx:id="anchorPaneMenu" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+          <AnchorPane fx:id="anchorPaneMenu" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <ToggleButton fx:id="btnChangeTheme" layoutX="14.0" layoutY="362.0" mnemonicParsing="false" onAction="#onButtonChangeThemeClick" prefWidth="80.0" text="Light" />
+               </children></AnchorPane>
         </content>
       </Tab>
     <Tab onSelectionChanged="#onTabExerciseClick" text="Exercise">
@@ -119,7 +124,11 @@
       </Tab>
       <Tab text="Open File">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Button fx:id="btnOpenFile" layoutX="260.0" layoutY="362.0" mnemonicParsing="false" onAction="#onButtonOpenFileClick" prefWidth="80.0" text="Open" />
+                  <TextArea fx:id="txtAreaOpenFile" layoutX="14.0" layoutY="14.0" prefHeight="180.0" prefWidth="400.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+               </children></AnchorPane>
         </content>
       </Tab>
   </tabs>

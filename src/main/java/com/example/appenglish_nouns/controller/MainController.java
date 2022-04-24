@@ -1,5 +1,6 @@
 package com.example.appenglish_nouns.controller;
 
+import com.example.appenglish_nouns.MainApp;
 import com.example.appenglish_nouns.model.Group;
 import com.example.appenglish_nouns.model.Noun;
 import javafx.collections.FXCollections;
@@ -10,9 +11,17 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MainController {
     @FXML
@@ -20,7 +29,7 @@ public class MainController {
     @FXML
     BarChart<String, Number> barChartNouns;
     @FXML
-    Button btnStart, btnCheck, btnSkip, btnFinish, btnAddNoun, btnRefresh;
+    Button btnStart, btnCheck, btnSkip, btnFinish, btnAddNoun, btnRefresh, btnOpenFile;
     @FXML
     CheckBox checkBoxHelper;
     @FXML
@@ -32,13 +41,18 @@ public class MainController {
     @FXML
     TableColumn<Noun, String> inEnglishColumn, inRussianColumn, inNameGroupColumn;
     @FXML
+    TableView<Noun> tableWords;
+    @FXML
+    TabPane tabPaneMain;
+    @FXML
+    TextArea txtAreaOpenFile;
+    @FXML
     TextField txtInEnglish, txtInRussian, txtFieldOutput;
     @FXML
-    TableView<Noun> tableWords;
+    ToggleButton btnChangeTheme;
     ArrayList<Group> arrayGroups;
     ArrayList<Noun> arrayNouns;
     Connection conn;
-
     int score = 0;
     Noun actualNoun;
     ObservableList<Noun> observableListNouns;
@@ -46,7 +60,7 @@ public class MainController {
     XYChart.Series<String, Number> dataSeries;
 
     public void initialize() {
-        String address = getClass().getResource("/com/example/appenglish_nouns/img/menu.jpg").toExternalForm();
+        String address = getClass().getResource("/com/example/appenglish_nouns/img/menu.png").toExternalForm();
         anchorPaneMenu.setStyle("-fx-background-image: url(" + address + ");");
 
         try {
@@ -110,6 +124,17 @@ public class MainController {
     }
 
     //Tab "Menu"
+    public void onButtonChangeThemeClick() {
+        tabPaneMain.getStylesheets().clear();
+        if (btnChangeTheme.isSelected()) {
+            btnChangeTheme.setText("Dark");
+            tabPaneMain.getStylesheets().add(MainApp.class.getResource("/com/example/appenglish_nouns/styles/darkTheme.css").toExternalForm());
+        }
+        else {
+            btnChangeTheme.setText("Light");
+            tabPaneMain.getStylesheets().add(MainApp.class.getResource("/com/example/appenglish_nouns/styles/lightTheme.css").toExternalForm());
+        }
+    }
 
     //Tab "Exercise"
     public void onTabExerciseClick() {
@@ -127,6 +152,7 @@ public class MainController {
         lblScore.setText("Score: " + score);
         txtFieldOutput.setDisable(true);
     }
+
     public void onButtonStartClick() {
         getNoun(arrayNouns);
         btnCheck.setDisable(false);
@@ -149,8 +175,7 @@ public class MainController {
             lblResult.setText("Right!");
             score++;
             lblScore.setText("Score: " + score);
-        }
-        else {
+        } else {
             lblResult.setText("Wrong!");
         }
         txtFieldOutput.clear();
@@ -161,6 +186,7 @@ public class MainController {
         }
         txtFieldOutput.requestFocus();
     }
+
     public void onButtonSkipClick() {
         getNoun(arrayNouns);
         lblInput.setText(actualNoun.inEnglish);
@@ -173,6 +199,7 @@ public class MainController {
         }
         txtFieldOutput.requestFocus();
     }
+
     public void onButtonFinishClick() {
         btnCheck.setDisable(true);
         btnFinish.setDisable(true);
@@ -189,8 +216,7 @@ public class MainController {
     public void onCheckBoxHelperClick() {
         if (checkBoxHelper.isSelected()) {
             txtFieldOutput.setText(String.valueOf(actualNoun.inRussian.charAt(0)));
-        }
-        else {
+        } else {
             txtFieldOutput.setText("");
         }
         txtFieldOutput.requestFocus();
@@ -222,9 +248,7 @@ public class MainController {
         try {
             runSQLInsertNouns(conn, addNoun);
             lblResultAddWord.setText("The object [" + addNoun.inEnglish + " : " + addNoun.inRussian + "] was successfully added");
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             lblResultAddWord.setText("Error! " + e.getMessage());
         }
     }
@@ -267,11 +291,30 @@ public class MainController {
 
         arrayGroups.sort(Comparator.comparing(o -> o.name));
 
-        for (Group g: arrayGroups) {
+        for (Group g : arrayGroups) {
             int count = (int) arrayNouns.stream().filter(n -> n.inNameGroup.equals(g.name)).count();
             dataSeries.getData().add(new XYChart.Data<>(g.name, count));
         }
 
         barChartNouns.getData().add(dataSeries);
+    }
+
+    //Tab "Open File"
+    public void onButtonOpenFileClick() {
+        txtAreaOpenFile.clear();
+
+        Stage stage = (Stage) btnOpenFile.getScene().getWindow(); //ToDo - need to fix this
+
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showOpenDialog(stage);
+        try {
+            Stream<String> text = Files.lines(Paths.get(file.getPath()));
+            txtAreaOpenFile.setText(text.map(String::valueOf).collect(Collectors.joining("\n")));
+        } catch (IOException e) {
+            txtAreaOpenFile.setText(e.getMessage());
+        }
     }
 }
