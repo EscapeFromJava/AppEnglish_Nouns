@@ -5,6 +5,7 @@ public class Noun {
     public String inEnglish;
     public String inRussian;
     public int inGroup;
+    public String inNameGroup;
 
     public int getId() {
         return id;
@@ -22,14 +23,11 @@ public class Noun {
         return inGroup;
     }
 
-    public Noun() {
+    public String getInNameGroup() {
+        return inNameGroup;
     }
 
-    public Noun(int id, String inEnglish, String inRussian, int inGroup) {
-        this.id = id;
-        this.inEnglish = inEnglish.toLowerCase();
-        this.inRussian = inRussian.toLowerCase();
-        this.inGroup = inGroup;
+    public Noun() {
     }
 
     public Noun(String inEnglish, String inRussian, int inGroup) {
@@ -38,14 +36,16 @@ public class Noun {
         this.inGroup = inGroup;
     }
 
-    public Noun(String inEnglish, String inRussian) {
+    public Noun(int id, String inEnglish, String inRussian, int inGroup, String inNameGroup) {
+        this.id = id;
         this.inEnglish = inEnglish.toLowerCase();
         this.inRussian = inRussian.toLowerCase();
+        this.inGroup = inGroup;
+        this.inNameGroup = inNameGroup.toLowerCase();
     }
 
     @Override
     public String toString() {
         return id + " " + inEnglish + " " + inRussian + " " + inGroup;
     }
-
 }
