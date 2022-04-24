@@ -5,13 +5,13 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -28,19 +28,21 @@
       <content>
         <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <VBox alignment="TOP_CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox alignment="TOP_CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="100.0" spacing="10.0">
                      <children>
                         <Button fx:id="btnStart" mnemonicParsing="false" onAction="#onButtonStartClick" prefWidth="80.0" text="Start" />
-                        <Button fx:id="btnCheck" disable="true" mnemonicParsing="false" onAction="#onButtonCheckClick" prefWidth="80.0" text="Check" />
-                        <Button fx:id="btnFinish" mnemonicParsing="false" onAction="#onButtonFinishClick" prefWidth="80.0" text="Finish" />
+                        <Button fx:id="btnCheck" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#onButtonCheckClick" prefWidth="80.0" text="Check" />
+                        <Button fx:id="btnSkip" disable="true" mnemonicParsing="false" onAction="#onButtonSkipClick" prefWidth="80.0" text="Skip" />
+                        <Button fx:id="btnFinish" disable="true" mnemonicParsing="false" onAction="#onButtonFinishClick" prefWidth="80.0" text="Finish" />
                         <Label fx:id="lblResult">
                            <VBox.margin>
                               <Insets top="80.0" />
                            </VBox.margin>
                         </Label>
-                        <Label fx:id="lblScore" text="Score:">
+                        <CheckBox fx:id="checkBoxHelper" disable="true" mnemonicParsing="false" onAction="#onCheckBoxHelperClick" text="Helper" />
+                        <Label fx:id="lblScore" alignment="CENTER" text="Score:">
                            <VBox.margin>
-                              <Insets top="150.0" />
+                              <Insets />
                            </VBox.margin>
                         </Label>
                      </children>
@@ -48,17 +50,16 @@
                         <Insets top="10.0" />
                      </padding>
                   </VBox>
-                  <Label fx:id="lblInput" alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="500.0" AnchorPane.bottomAnchor="201.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <Label fx:id="lblInput" alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="500.0">
                      <font>
                         <Font size="24.0" />
                      </font>
                   </Label>
-                  <TextArea fx:id="txtAreaOutput" layoutX="100.0" layoutY="348.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="52.0" prefWidth="500.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="348.0">
+                  <TextField fx:id="txtFieldOutput" alignment="CENTER" disable="true" layoutX="100.0" layoutY="201.0" prefHeight="200.0" prefWidth="500.0">
                      <font>
                         <Font size="24.0" />
                      </font>
-                  </TextArea>
-                  <TextField fx:id="txtFieldOutput" layoutX="100.0" layoutY="201.0" prefHeight="135.0" prefWidth="500.0" />
+                  </TextField>
                </children>
             </AnchorPane>
       </content>
@@ -67,13 +68,14 @@
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <Label layoutX="70.0" layoutY="65.0" prefHeight="20.0" prefWidth="80.0" text="In English:" />
-                  <Button fx:id="btnAddNoun" layoutX="163.0" layoutY="226.0" mnemonicParsing="false" onAction="#onButtonAddNounClick" prefHeight="25.0" prefWidth="150.0" text="Add" />
-                  <TextField fx:id="txtInEnglsh" layoutX="163.0" layoutY="63.0" prefHeight="20.0" prefWidth="150.0" />
-                  <Label layoutX="70.0" layoutY="115.0" prefHeight="20.0" prefWidth="80.0" text="In Russian:" />
-                  <TextField fx:id="txtInRussian" layoutX="163.0" layoutY="113.0" prefHeight="20.0" prefWidth="150.0" />
-                  <Label layoutX="70.0" layoutY="166.0" prefHeight="20.0" prefWidth="80.0" text="Group" />
-                  <ComboBox fx:id="comboBoxGroup" layoutX="163.0" layoutY="164.0" prefWidth="150.0" />
+                  <Label layoutX="179.0" layoutY="65.0" prefHeight="20.0" prefWidth="80.0" text="In English:" />
+                  <Button fx:id="btnAddNoun" layoutX="272.0" layoutY="226.0" mnemonicParsing="false" onAction="#onButtonAddNounClick" prefHeight="25.0" prefWidth="150.0" text="Add" />
+                  <TextField fx:id="txtInEnglish" layoutX="272.0" layoutY="63.0" prefHeight="20.0" prefWidth="150.0" />
+                  <Label layoutX="179.0" layoutY="115.0" prefHeight="20.0" prefWidth="80.0" text="In Russian:" />
+                  <TextField fx:id="txtInRussian" layoutX="272.0" layoutY="113.0" prefHeight="20.0" prefWidth="150.0" />
+                  <Label layoutX="179.0" layoutY="166.0" prefHeight="20.0" prefWidth="80.0" text="Group" />
+                  <ComboBox fx:id="comboBoxGroup" layoutX="272.0" layoutY="164.0" prefWidth="150.0" />
+                  <Label fx:id="lblResultAddWord" layoutX="43.0" layoutY="342.0" />
                </children>
             </AnchorPane>
       </content>

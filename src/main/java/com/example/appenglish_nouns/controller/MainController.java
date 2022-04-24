@@ -4,7 +4,6 @@ import com.example.appenglish_nouns.model.Group;
 import com.example.appenglish_nouns.model.Noun;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
@@ -21,22 +20,21 @@ public class MainController {
     @FXML
     BarChart<String, Number> barChartNouns;
     @FXML
-    Button btnStart, btnCheck, btnFinish, btnAddNoun, btnRefresh;
+    Button btnStart, btnCheck, btnSkip, btnFinish, btnAddNoun, btnRefresh;
+    @FXML
+    CheckBox checkBoxHelper;
     @FXML
     ComboBox<String> comboBoxGroup;
     @FXML
-    Label lblInput, lblResult, lblScore;
+    Label lblInput, lblResult, lblScore, lblResultAddWord;
     @FXML
     TableColumn<Noun, Integer> idColumn, inGroupColumn;
     @FXML
     TableColumn<Noun, String> inEnglishColumn, inRussianColumn, inNameGroupColumn;
     @FXML
-    TextField txtInEnglsh, txtInRussian, txtFieldOutput;
+    TextField txtInEnglish, txtInRussian, txtFieldOutput;
     @FXML
     TableView<Noun> tableWords;
-    @FXML
-    TextArea txtAreaOutput;
-
     ArrayList<Group> arrayGroups;
     ArrayList<Noun> arrayNouns;
     Connection conn;
@@ -117,23 +115,35 @@ public class MainController {
     public void onTabExerciseClick() {
         runSQLSelectNouns(conn);
         btnCheck.setDisable(true);
+        btnFinish.setDisable(true);
+        btnSkip.setDisable(true);
         btnStart.setDisable(false);
+        if (checkBoxHelper.isSelected())
+            checkBoxHelper.fire();
+        checkBoxHelper.setDisable(true);
+        checkBoxHelper.setDisable(true);
         lblInput.setText("");
         lblResult.setText("");
         lblScore.setText("Score: " + score);
+        txtFieldOutput.setDisable(true);
     }
     public void onButtonStartClick() {
         getNoun(arrayNouns);
         btnCheck.setDisable(false);
+        btnFinish.setDisable(false);
+        btnSkip.setDisable(false);
         btnStart.setDisable(true);
+        checkBoxHelper.setDisable(false);
         if (lblInput.getText().equals(""))
             lblInput.setText(actualNoun.inEnglish);
         score = 0;
         lblScore.setText("Score: " + score);
+        txtFieldOutput.setDisable(false);
+        txtFieldOutput.requestFocus();
     }
 
     public void onButtonCheckClick() {
-        if (txtAreaOutput.getText().toLowerCase().equals(actualNoun.inRussian.toLowerCase())) {
+        if (txtFieldOutput.getText().toLowerCase().equals(actualNoun.inRussian.toLowerCase())) {
             getNoun(arrayNouns);
             lblInput.setText(actualNoun.inEnglish);
             lblResult.setText("Right!");
@@ -143,18 +153,56 @@ public class MainController {
         else {
             lblResult.setText("Wrong!");
         }
-        txtAreaOutput.clear();
+        txtFieldOutput.clear();
+        if (checkBoxHelper.isSelected()) {
+            txtFieldOutput.setText(String.valueOf(actualNoun.inRussian.charAt(0)));
+            txtFieldOutput.requestFocus();
+            txtFieldOutput.forward();
+        }
+        txtFieldOutput.requestFocus();
     }
-
+    public void onButtonSkipClick() {
+        getNoun(arrayNouns);
+        lblInput.setText(actualNoun.inEnglish);
+        lblResult.setText("");
+        txtFieldOutput.clear();
+        if (checkBoxHelper.isSelected()) {
+            txtFieldOutput.setText(String.valueOf(actualNoun.inRussian.charAt(0)));
+            txtFieldOutput.requestFocus();
+            txtFieldOutput.forward();
+        }
+        txtFieldOutput.requestFocus();
+    }
     public void onButtonFinishClick() {
         btnCheck.setDisable(true);
+        btnFinish.setDisable(true);
+        btnSkip.setDisable(true);
         btnStart.setDisable(false);
+        if (checkBoxHelper.isSelected())
+            checkBoxHelper.fire();
+        checkBoxHelper.setDisable(true);
         lblInput.setText("");
         lblResult.setText("");
+        txtFieldOutput.setDisable(true);
+    }
+
+    public void onCheckBoxHelperClick() {
+        if (checkBoxHelper.isSelected()) {
+            txtFieldOutput.setText(String.valueOf(actualNoun.inRussian.charAt(0)));
+        }
+        else {
+            txtFieldOutput.setText("");
+        }
+        txtFieldOutput.requestFocus();
+        txtFieldOutput.forward();
     }
 
     //Tab "Add Word"
     public void onTabAddWordClick() {
+        lblResultAddWord.setText("");
+        txtInEnglish.setText("");
+        txtInRussian.setText("");
+
         runSQLSelectGroups(conn);
 
         observableListGroupsName = FXCollections.observableArrayList();
@@ -170,12 +218,19 @@ public class MainController {
     public void onButtonAddNounClick() {
         String selectedGroup = comboBoxGroup.getValue().toString();
         Group resultingGroup = arrayGroups.stream().filter(g -> g.name.equals(selectedGroup)).findFirst().get();
-        Noun addNoun = new Noun(txtInEnglsh.getText(), txtInRussian.getText(), resultingGroup.id);
-        runSQLInsertNouns(conn, addNoun);
+        Noun addNoun = new Noun(txtInEnglish.getText(), txtInRussian.getText(), resultingGroup.id);
+        try {
+            runSQLInsertNouns(conn, addNoun);
+            lblResultAddWord.setText("The object [" + addNoun.inEnglish + " : " + addNoun.inRussian + "] was successfully added");
+        }
+        catch (Exception e)
+        {
+            lblResultAddWord.setText("Error! " + e.getMessage());
+        }
     }
 
     //Tab "List Words"
-    public void onTabListWordsClick(Event event) {
+    public void onTabListWordsClick() {
         getListWords();
     }
 
@@ -198,7 +253,6 @@ public class MainController {
         tableWords.setItems(observableListNouns);
     }
 
-
     //Tab "Chart"
     public void onTabChartClick() {
         if (dataSeries != null) {
@@ -208,18 +262,16 @@ public class MainController {
         runSQLSelectGroups(conn);
         runSQLSelectNouns(conn);
 
-        dataSeries = new XYChart.Series<String, Number>();
+        dataSeries = new XYChart.Series<>();
         dataSeries.setName("Nouns Chart");
 
         arrayGroups.sort(Comparator.comparing(o -> o.name));
 
         for (Group g: arrayGroups) {
             int count = (int) arrayNouns.stream().filter(n -> n.inNameGroup.equals(g.name)).count();
-            dataSeries.getData().add(new XYChart.Data<String, Number>(g.name, count));
+            dataSeries.getData().add(new XYChart.Data<>(g.name, count));
         }
 
         barChartNouns.getData().add(dataSeries);
     }
-
-
 }
