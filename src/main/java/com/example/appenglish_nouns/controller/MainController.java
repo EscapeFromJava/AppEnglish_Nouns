@@ -56,7 +56,6 @@ public class MainController {
     @FXML
     ToggleButton btnChangeTheme;
     Connection conn;
-    int score = 0;
     Noun actualNoun;
     ObservableList<Noun> observableListNouns;
     ObservableList<String> observableListGroupsName;
@@ -95,6 +94,7 @@ public class MainController {
 
     //Tab "Exercise"
     public void onTabExerciseClick() {
+        session = new Session("Player");
         SQLrequest.runSQLSelectNouns(conn);
         btnCheck.setDisable(true);
         btnFinish.setDisable(true);
@@ -106,7 +106,7 @@ public class MainController {
         checkBoxHelper.setDisable(true);
         lblInput.setText("");
         lblResult.setText("");
-        lblScore.setText("Score: " + score);
+        lblScore.setVisible(false);
         lblSessionTime.setText("");
         txtFieldOutput.setDisable(true);
     }
@@ -120,12 +120,12 @@ public class MainController {
         checkBoxHelper.setDisable(false);
         if (lblInput.getText().equals(""))
             lblInput.setText(actualNoun.inEnglish);
-        score = 0;
-        lblScore.setText("Score: " + score);
+        lblScore.setVisible(true);
+        session.resetScore();
+        lblScore.setText("Score: " + session.getScore());
         lblSessionTime.setText("");
         txtFieldOutput.setDisable(false);
         txtFieldOutput.requestFocus();
-        session = new Session("Player");
     }
 
     public void onButtonCheckClick() {
@@ -133,8 +133,8 @@ public class MainController {
             getNoun(arrayNouns);
             lblInput.setText(actualNoun.inEnglish);
             lblResult.setText("Right!");
-            score++;
-            lblScore.setText("Score: " + score);
+            session.addScore();
+            lblScore.setText("Score: " + session.getScore());
         } else {
             lblResult.setText("Wrong!");
         }

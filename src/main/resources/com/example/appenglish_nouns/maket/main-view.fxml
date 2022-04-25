@@ -45,7 +45,7 @@
                            </VBox.margin>
                         </Label>
                         <CheckBox fx:id="checkBoxHelper" disable="true" mnemonicParsing="false" onAction="#onCheckBoxHelperClick" text="Helper" />
-                        <Label fx:id="lblScore" alignment="CENTER" text="Score:">
+                        <Label fx:id="lblScore" alignment="CENTER" text="Score:" visible="false">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>

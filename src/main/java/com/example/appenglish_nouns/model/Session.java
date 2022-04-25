@@ -8,10 +8,23 @@ public class Session {
     private String name;
     private Date start;
     private Date finish;
+    private int score = 0;
 
     public Session(String name) {
         this.name = name;
         setStart();
+    }
+
+    public void addScore() {
+        this.score++;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void resetScore() {
+        score = 0;
     }
 
     private void setStart() {
