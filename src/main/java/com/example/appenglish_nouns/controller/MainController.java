@@ -287,8 +287,6 @@ public class MainController {
 
     //Tab "Open File"
     public void onButtonOpenFileClick() {
-        txtAreaOpenFile.clear();
-
         Stage stage = (Stage) btnOpenFile.getScene().getWindow(); //ToDo - need to fix this
 
         FileChooser fileChooser = new FileChooser();
@@ -296,12 +294,14 @@ public class MainController {
         fileChooser.getExtensionFilters().add(extFilter);
 
         File file = fileChooser.showOpenDialog(stage);
-
-        try {
-            Stream<String> text = Files.lines(Paths.get(file.getPath()));
-            txtAreaOpenFile.setText(text.map(String::valueOf).collect(Collectors.joining("\n")));
-        } catch (IOException e) {
-            txtAreaOpenFile.setText(e.getMessage());
+        if (file != null) {
+            try {
+                txtAreaOpenFile.clear();
+                Stream<String> text = Files.lines(Paths.get(file.getPath()));
+                txtAreaOpenFile.setText(text.map(String::valueOf).collect(Collectors.joining("\n")));
+            } catch (IOException e) {
+                txtAreaOpenFile.setText(e.getMessage());
+            }
         }
     }
 }
