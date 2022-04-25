@@ -1,5 +1,8 @@
 package com.example.appenglish_nouns.model;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class Noun {
     public int id;
     public String inEnglish;
@@ -42,6 +45,10 @@ public class Noun {
         this.inRussian = inRussian.toLowerCase();
         this.inGroup = inGroup;
         this.inNameGroup = inNameGroup.toLowerCase();
+    }
+
+    public boolean isNull(){
+        return inEnglish.length() < 1 || inRussian.length() < 1;
     }
 
     @Override

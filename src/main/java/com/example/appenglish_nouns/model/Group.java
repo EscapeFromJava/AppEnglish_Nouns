@@ -12,11 +12,18 @@ public class Group {
         return name;
     }
 
+    public Group(String name) {
+        this.name = name;
+    }
+
     public Group(int id, String name) {
         this.id = id;
         this.name = name.toLowerCase();
     }
 
+    public boolean isNull(){
+        return name.length() < 1;
+    }
     @Override
     public String toString() { return id + " " + name; }
 

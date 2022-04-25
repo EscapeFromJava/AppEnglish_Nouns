@@ -3,6 +3,7 @@ package com.example.appenglish_nouns.controller;
 import com.example.appenglish_nouns.MainApp;
 import com.example.appenglish_nouns.model.Group;
 import com.example.appenglish_nouns.model.Noun;
+import com.example.appenglish_nouns.model.SQLrequest;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -23,19 +24,22 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.example.appenglish_nouns.model.SQLrequest.arrayGroups;
+import static com.example.appenglish_nouns.model.SQLrequest.arrayNouns;
+
 public class MainController {
     @FXML
     AnchorPane anchorPaneMenu;
     @FXML
     BarChart<String, Number> barChartNouns;
     @FXML
-    Button btnStart, btnCheck, btnSkip, btnFinish, btnAddNoun, btnRefresh, btnOpenFile;
+    Button btnStart, btnCheck, btnSkip, btnFinish, btnAddNoun, btnAddGroup, btnRefresh, btnOpenFile;
     @FXML
     CheckBox checkBoxHelper;
     @FXML
     ComboBox<String> comboBoxGroup;
     @FXML
-    Label lblInput, lblResult, lblScore, lblResultAddWord;
+    Label lblInput, lblResult, lblScore, lblResultAddNoun, lblResultAddGroup;
     @FXML
     TableColumn<Noun, Integer> idColumn, inGroupColumn;
     @FXML
@@ -47,11 +51,9 @@ public class MainController {
     @FXML
     TextArea txtAreaOpenFile;
     @FXML
-    TextField txtInEnglish, txtInRussian, txtFieldOutput;
+    TextField txtInEnglish, txtInRussian, txtGroupName, txtFieldOutput;
     @FXML
     ToggleButton btnChangeTheme;
-    ArrayList<Group> arrayGroups;
-    ArrayList<Noun> arrayNouns;
     Connection conn;
     int score = 0;
     Noun actualNoun;
@@ -67,54 +69,6 @@ public class MainController {
             conn = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/EnglishApp", "postgres", "123");
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    //SQL executes
-    public void runSQLSelectGroups(Connection conn) {
-        try {
-            arrayGroups = new ArrayList<>();
-            String execute = "SELECT * FROM groups";
-            PreparedStatement statement = conn.prepareStatement(execute);
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
-                arrayGroups.add(new Group(rs.getInt("id"),
-                        rs.getString("name")));
-            }
-        } catch (SQLException e) {
-            System.out.println("select ERROR: " + e.getMessage());
-        }
-    }
-
-    public void runSQLSelectNouns(Connection conn) {
-        try {
-            arrayNouns = new ArrayList<>();
-            String execute = "SELECT nouns.id AS n_id, in_english, in_russian, groups.id AS g_id, groups.name AS g_name  " +
-                    "FROM nouns " +
-                    "JOIN groups ON nouns.in_group = groups.id";
-            PreparedStatement statement = conn.prepareStatement(execute);
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
-                arrayNouns.add(new Noun(rs.getInt("n_id"),
-                        rs.getString("in_english"),
-                        rs.getString("in_russian"),
-                        rs.getInt("g_id"),
-                        rs.getString("g_name")));
-            }
-        } catch (SQLException e) {
-            System.out.println("select ERROR: " + e.getMessage());
-        }
-    }
-
-
-    public void runSQLInsertNouns(Connection conn, Noun newNoun) {
-        try {
-            String execute = "INSERT INTO nouns(in_english, in_russian, in_group)  " +
-                    "VALUES( \'" + newNoun.inEnglish + "\', \'" + newNoun.inRussian + "\', " + newNoun.inGroup + ");";
-            PreparedStatement statement = conn.prepareStatement(execute);
-            statement.execute();
-        } catch (SQLException e) {
-            System.out.println("insert ERROR: " + e.getMessage());
         }
     }
 
@@ -138,7 +92,7 @@ public class MainController {
 
     //Tab "Exercise"
     public void onTabExerciseClick() {
-        runSQLSelectNouns(conn);
+        SQLrequest.runSQLSelectNouns(conn);
         btnCheck.setDisable(true);
         btnFinish.setDisable(true);
         btnSkip.setDisable(true);
@@ -223,13 +177,50 @@ public class MainController {
         txtFieldOutput.forward();
     }
 
-    //Tab "Add Word"
-    public void onTabAddWordClick() {
-        lblResultAddWord.setText("");
+    //Tab "Add"
+    public void onTabAddClick() {
         txtInEnglish.setText("");
         txtInRussian.setText("");
+        lblResultAddNoun.setText("");
 
-        runSQLSelectGroups(conn);
+        txtGroupName.setText("");
+        lblResultAddGroup.setText("");
+
+        refreshListGroup();
+    }
+
+    public void onButtonAddNounClick() {
+        String selectedGroup = comboBoxGroup.getValue().toString();
+        Group resultingGroup = arrayGroups.stream().filter(g -> g.name.equals(selectedGroup)).findFirst().get();
+        Noun newNoun = new Noun(txtInEnglish.getText(), txtInRussian.getText(), resultingGroup.id);
+        if (!newNoun.isNull()) {
+            try {
+                SQLrequest.runSQLInsertNoun(conn, newNoun);
+                lblResultAddNoun.setText("The object [" + newNoun.inEnglish + " : " + newNoun.inRussian + "] was successfully added");
+            } catch (Exception e) {
+                lblResultAddNoun.setText("Error! " + e.getMessage());
+            }
+        }
+        else
+            lblResultAddNoun.setText("Fill in the fields");
+    }
+    public void onButtonAddGroupClick() {
+        Group newGroup = new Group(txtGroupName.getText());
+        if (!newGroup.isNull()) {
+            try {
+                SQLrequest.runSQLInsertGroup(conn, newGroup);
+                lblResultAddGroup.setText("The object [" + newGroup.name + "] was successfully added");
+            } catch (Exception e) {
+                lblResultAddGroup.setText("Error! " + e.getMessage());
+            }
+        }
+        else
+            lblResultAddGroup.setText("Fill in the fields");
+
+        refreshListGroup();
+    }
+    public void refreshListGroup() {
+        SQLrequest.runSQLSelectGroups(conn);
 
         observableListGroupsName = FXCollections.observableArrayList();
 
@@ -239,18 +230,6 @@ public class MainController {
 
         comboBoxGroup.setItems(observableListGroupsName.sorted());
         comboBoxGroup.setValue("any");
-    }
-
-    public void onButtonAddNounClick() {
-        String selectedGroup = comboBoxGroup.getValue().toString();
-        Group resultingGroup = arrayGroups.stream().filter(g -> g.name.equals(selectedGroup)).findFirst().get();
-        Noun addNoun = new Noun(txtInEnglish.getText(), txtInRussian.getText(), resultingGroup.id);
-        try {
-            runSQLInsertNouns(conn, addNoun);
-            lblResultAddWord.setText("The object [" + addNoun.inEnglish + " : " + addNoun.inRussian + "] was successfully added");
-        } catch (Exception e) {
-            lblResultAddWord.setText("Error! " + e.getMessage());
-        }
     }
 
     //Tab "List Words"
@@ -263,7 +242,7 @@ public class MainController {
     }
 
     public void getListWords() {
-        runSQLSelectNouns(conn);
+        SQLrequest.runSQLSelectNouns(conn);
 
         observableListNouns = FXCollections.observableArrayList();
         observableListNouns.addAll(arrayNouns);
@@ -283,8 +262,8 @@ public class MainController {
             barChartNouns.getData().clear();
         }
 
-        runSQLSelectGroups(conn);
-        runSQLSelectNouns(conn);
+        SQLrequest.runSQLSelectGroups(conn);
+        SQLrequest.runSQLSelectNouns(conn);
 
         dataSeries = new XYChart.Series<>();
         dataSeries.setName("Nouns Chart");
@@ -310,6 +289,7 @@ public class MainController {
         fileChooser.getExtensionFilters().add(extFilter);
 
         File file = fileChooser.showOpenDialog(stage);
+
         try {
             Stream<String> text = Files.lines(Paths.get(file.getPath()));
             txtAreaOpenFile.setText(text.map(String::valueOf).collect(Collectors.joining("\n")));
