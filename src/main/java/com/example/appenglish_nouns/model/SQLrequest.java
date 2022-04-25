@@ -53,7 +53,6 @@ public class SQLrequest {
             System.out.println("insert ERROR: " + e.getMessage());
         }
     }
-
     public static void runSQLInsertGroup(Connection conn, Group newGroup) {
         try {
             String execute = "INSERT INTO groups(name)  " +

@@ -4,6 +4,7 @@ import com.example.appenglish_nouns.MainApp;
 import com.example.appenglish_nouns.model.Group;
 import com.example.appenglish_nouns.model.Noun;
 import com.example.appenglish_nouns.model.SQLrequest;
+import com.example.appenglish_nouns.model.Session;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -39,7 +40,7 @@ public class MainController {
     @FXML
     ComboBox<String> comboBoxGroup;
     @FXML
-    Label lblInput, lblResult, lblScore, lblResultAddNoun, lblResultAddGroup;
+    Label lblInput, lblResult, lblScore, lblSessionTime, lblResultAddNoun, lblResultAddGroup;
     @FXML
     TableColumn<Noun, Integer> idColumn, inGroupColumn;
     @FXML
@@ -59,6 +60,8 @@ public class MainController {
     Noun actualNoun;
     ObservableList<Noun> observableListNouns;
     ObservableList<String> observableListGroupsName;
+
+    Session session;
     XYChart.Series<String, Number> dataSeries;
 
     public void initialize() {
@@ -104,6 +107,7 @@ public class MainController {
         lblInput.setText("");
         lblResult.setText("");
         lblScore.setText("Score: " + score);
+        lblSessionTime.setText("");
         txtFieldOutput.setDisable(true);
     }
 
@@ -118,8 +122,10 @@ public class MainController {
             lblInput.setText(actualNoun.inEnglish);
         score = 0;
         lblScore.setText("Score: " + score);
+        lblSessionTime.setText("");
         txtFieldOutput.setDisable(false);
         txtFieldOutput.requestFocus();
+        session = new Session("Player");
     }
 
     public void onButtonCheckClick() {
@@ -165,6 +171,7 @@ public class MainController {
         lblInput.setText("");
         lblResult.setText("");
         txtFieldOutput.setDisable(true);
+        lblSessionTime.setText(session.getSessionTime());
     }
 
     public void onCheckBoxHelperClick() {

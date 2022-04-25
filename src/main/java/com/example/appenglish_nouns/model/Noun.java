@@ -1,8 +1,5 @@
 package com.example.appenglish_nouns.model;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 public class Noun {
     public int id;
     public String inEnglish;
